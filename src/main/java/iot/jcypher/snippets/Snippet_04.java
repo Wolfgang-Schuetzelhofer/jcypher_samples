@@ -4,12 +4,12 @@
 
 package iot.jcypher.snippets;
 
-import iot.jcypher.JcQuery;
-import iot.jcypher.JcQueryResult;
 import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.JcQueryResult;
 
 import java.util.Properties;
 

@@ -16,8 +16,6 @@
 
 package iot.jcypher.samples;
 
-import iot.jcypher.JcQuery;
-import iot.jcypher.JcQueryResult;
 import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
@@ -27,14 +25,16 @@ import iot.jcypher.graph.GrNode;
 import iot.jcypher.graph.GrProperty;
 import iot.jcypher.graph.GrRelation;
 import iot.jcypher.graph.Graph;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
 import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.factories.clause.RETURN;
+import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.values.JcNode;
 import iot.jcypher.query.values.JcNumber;
 import iot.jcypher.query.writer.Format;
-import iot.jcypher.result.JcError;
 import iot.jcypher.util.Util;
 
 import java.math.BigDecimal;
