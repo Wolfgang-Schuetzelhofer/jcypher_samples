@@ -16,17 +16,51 @@
 
 package iot.jcypher.samples.domain.people.model;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Person extends Subject {
 
-public abstract class Subject {
+	private String firstName;
+	private String lastName;
+	private Gender gender;
+	private Person father;
+	private Person mother;
 	
-	private List<PointOfContact> pointsOfContact;
-
-	public List<PointOfContact> getPointsOfContact() {
-		if (this.pointsOfContact == null)
-			this.pointsOfContact = new ArrayList<PointOfContact>();
-		return pointsOfContact;
+	public Person() {
+		super();
 	}
 
+	public Person(String firstName, String lastName, Gender gender) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.gender = gender;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public Gender getGender() {
+		return gender;
+	}
+
+	public Person getFather() {
+		return father;
+	}
+
+	public void setFather(Person father) {
+		this.father = father;
+	}
+
+	public Person getMother() {
+		return mother;
+	}
+
+	public void setMother(Person mother) {
+		this.mother = mother;
+	}
+	
 }

@@ -14,19 +14,27 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples.domain.people.model;
+package iot.jcypher.samples.domain.people.graph_access;
 
-import java.util.ArrayList;
+import iot.jcypher.domain.IDomainAccess;
+
 import java.util.List;
 
-public abstract class Subject {
-	
-	private List<PointOfContact> pointsOfContact;
+public class DomainReader {
 
-	public List<PointOfContact> getPointsOfContact() {
-		if (this.pointsOfContact == null)
-			this.pointsOfContact = new ArrayList<PointOfContact>();
-		return pointsOfContact;
+	/**
+	 * given a list of ids load the domain object graph rooted by this ids.
+	 * @param objectIds
+	 * @return a list of domain objects
+	 */
+	public List<Object> loadDomainObjects(List<Long> objectIds) {
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		long[] ids = new long[objectIds.size()];
+		for (int i = 0; i < objectIds.size(); i++) {
+			ids[i] = objectIds.get(i);
+		}
+		List<Object> domainObjects = domainAccess.loadByIds(Object.class, -1, ids);
+		return domainObjects;
 	}
-
 }

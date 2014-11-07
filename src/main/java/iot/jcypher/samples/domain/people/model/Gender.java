@@ -16,17 +16,6 @@
 
 package iot.jcypher.samples.domain.people.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public abstract class Subject {
-	
-	private List<PointOfContact> pointsOfContact;
-
-	public List<PointOfContact> getPointsOfContact() {
-		if (this.pointsOfContact == null)
-			this.pointsOfContact = new ArrayList<PointOfContact>();
-		return pointsOfContact;
-	}
-
+public enum Gender {
+	FEMALE, MALE
 }

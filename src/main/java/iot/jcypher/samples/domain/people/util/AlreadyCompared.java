@@ -14,19 +14,37 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples.domain.people.model;
+package iot.jcypher.samples.domain.people.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Subject {
+public class AlreadyCompared {
+	private Object object1;
+	private Object object2;
+	private boolean result;
 	
-	private List<PointOfContact> pointsOfContact;
-
-	public List<PointOfContact> getPointsOfContact() {
-		if (this.pointsOfContact == null)
-			this.pointsOfContact = new ArrayList<PointOfContact>();
-		return pointsOfContact;
+	public AlreadyCompared(Object object1, Object object2) {
+		super();
+		this.object1 = object1;
+		this.object2 = object2;
+	}
+	
+	public boolean setResult(boolean b) {
+		this.result = b;
+		return b;
+	}
+	
+	public boolean getResult() {
+		return result;
 	}
 
+	public static AlreadyCompared alreadyCompared(Object obj1, Object obj2,
+			List<AlreadyCompared> alreadyCompareds) {
+		for (AlreadyCompared ac : alreadyCompareds) {
+			if ((ac.object1 == obj1 && ac.object2 == obj2) ||
+					(ac.object1 == obj2 && ac.object2 == obj2))
+				return ac;
+		}
+		return null;
+	}
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples.domain.people;
+package iot.jcypher.samples.domain.people.graph_access;
 
 import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;

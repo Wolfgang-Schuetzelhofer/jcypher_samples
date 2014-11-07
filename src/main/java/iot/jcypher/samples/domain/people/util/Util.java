@@ -14,19 +14,25 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples.domain.people.model;
+package iot.jcypher.samples.domain.people.util;
 
-import java.util.ArrayList;
+import iot.jcypher.query.result.JcError;
+
 import java.util.List;
 
-public abstract class Subject {
-	
-	private List<PointOfContact> pointsOfContact;
+public class Util {
 
-	public List<PointOfContact> getPointsOfContact() {
-		if (this.pointsOfContact == null)
-			this.pointsOfContact = new ArrayList<PointOfContact>();
-		return pointsOfContact;
+	/**
+	 * print errors to System.out
+	 * @param result
+	 */
+	public static void printErrors(List<JcError> errors) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("---------------Errors:");
+		iot.jcypher.util.Util.appendErrorList(errors, sb);
+		sb.append("\n---------------end Errors:");
+		String str = sb.toString();
+		System.out.println("");
+		System.out.println(str);
 	}
-
 }
