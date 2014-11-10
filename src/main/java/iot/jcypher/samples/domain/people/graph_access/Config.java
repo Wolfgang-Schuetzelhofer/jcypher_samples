@@ -31,23 +31,36 @@ public class Config {
 	private static IDBAccess dbAccess;
 	
 	static {
+		// a domain needs a unique name within a graph database
 		domainName = "PEOPLE-DOMAIN";
-		Properties props = new Properties();
 		
 		// properties for remote access and for embedded access
 		// (not needed for in memory access)
+		Properties props = new Properties();
+		
+		// properties for remote access
 		props.setProperty(DBProperties.SERVER_ROOT_URI, "http://localhost:7474");
+		// properties for embedded access
 		props.setProperty(DBProperties.DATABASE_DIR, "C:/NEO4J_DBS/01");
+		// no properties needed for in memory access
 		
 		dbAccess = DBAccessFactory.createDBAccess(DBType.REMOTE, props);
 //		dbAccess = DBAccessFactory.createDBAccess(DBType.EMBEDDED, props);
 //		dbAccess = DBAccessFactory.createDBAccess(DBType.IN_MEMORY, props);
 	}
 	
+	/**
+	 * answer an IDBAccess to access a graph database
+	 * @return an IDBAccess
+	 */
 	public static IDBAccess getDBAccess() {
 		return dbAccess;
 	}
 	
+	/**
+	 * answer a new IDomainAccess to work with a certain domain within a graph database
+	 * @return a new IDomainAccess
+	 */
 	public static IDomainAccess createDomainAccess() {
 		return DomainAccessFactory.createDomainAccess(dbAccess, domainName);
 	}

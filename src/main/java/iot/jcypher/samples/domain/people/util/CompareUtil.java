@@ -31,6 +31,29 @@ public class CompareUtil {
 		return equalsObjects(o_1, o_2, null);
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public static boolean equalsUnorderedList(List list_1, List list_2) {
+		ArrayList<AlreadyCompared> acs = new ArrayList<AlreadyCompared>();
+		if (list_1.size() != list_2.size())
+        	return false;
+		ListIterator<?> e1 = list_1.listIterator();
+        while (e1.hasNext()) {
+        	boolean found = false;
+            Object o1 = e1.next();
+            ListIterator<?> e2 = list_2.listIterator();
+            while (e2.hasNext()) {
+	            Object o2 = e2.next();
+	            if (o1==null ? o2==null : equalsObjects(o1, o2, acs)) {
+	            	found = true;
+	            	break;
+	            }
+            }
+            if (!found)
+            	return false;
+        }
+        return true;
+	}
+	
 	private static boolean equalsObjects(Object o_1, Object o_2, List<AlreadyCompared> alreadyCompareds) {
 		List<AlreadyCompared> acs = alreadyCompareds;
 		if (acs == null)
