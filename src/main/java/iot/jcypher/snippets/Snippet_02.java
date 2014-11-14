@@ -4,8 +4,8 @@
 
 package iot.jcypher.snippets;
 
-import iot.jcypher.query.CypherWriter;
 import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.writer.CypherWriter;
 import iot.jcypher.query.writer.Format;
 import iot.jcypher.query.writer.WriterContext;
 

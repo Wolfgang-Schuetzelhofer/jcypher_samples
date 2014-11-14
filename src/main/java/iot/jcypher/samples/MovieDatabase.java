@@ -130,7 +130,7 @@ public class MovieDatabase {
 	 * Create the movie database
 	 */
 	static void createMovieDatabaseByGraphModel() {
-Graph graph = Graph.create(dbAccess);
+		Graph graph = Graph.create(dbAccess);
 		
 		GrNode matrix1 = graph.createNode();
 		matrix1.addLabel("Movie");

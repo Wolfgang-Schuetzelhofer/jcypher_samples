@@ -85,7 +85,7 @@ public class PeopleDomain {
 		// Load a graph of domain objects from the graph database.
 		// By means of the second parameter you can specify the resolution depth.
 		// 0 would mean you only load simple attributes into the objects (i.e. attributes which have been stored
-		// to a node property; e.g. strings or numbers).
+		// to a node property; strings, numbers, booleans, dates).
 		// Complex attributes are stored in separate nodes accessed via relations.
 		// So with the second parameter you can specify how deep exactly the graph should be navigated
 		// when loading objects.
