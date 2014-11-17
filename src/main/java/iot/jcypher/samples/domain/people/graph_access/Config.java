@@ -27,7 +27,7 @@ import java.util.Properties;
 
 public class Config {
 
-	private static String domainName;
+	public static String domainName;
 	private static IDBAccess dbAccess;
 	
 	static {

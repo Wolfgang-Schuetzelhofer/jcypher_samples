@@ -17,8 +17,10 @@
 package iot.jcypher.samples.domain.people;
 
 import iot.jcypher.database.IDBAccess;
+import iot.jcypher.domain.DomainInformation;
 import iot.jcypher.domain.IDomainAccess;
 import iot.jcypher.domain.SyncInfo;
+import iot.jcypher.domain.DomainInformation.DomainObjectType;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.result.JcResultException;
 import iot.jcypher.samples.domain.people.graph_access.Config;
@@ -32,6 +34,19 @@ import java.util.List;
 public class PeopleDomain {
 
 	public static void main(String[] args) {
+		
+		// demonstrates how to store and retrieve domain objects.
+		storeAndRetrieveDomainObjects();
+		
+		// demonstrates how to retrieve domain information.
+		retrieveDomainInformation();
+		return;
+	}
+	
+	/**
+	 * demonstrates how to store and retrieve domain objects.
+	 */
+	public static void storeAndRetrieveDomainObjects() {
 		List<JcError> errors;
 		
 		// A utility class which simply creates a sample population.
@@ -62,6 +77,7 @@ public class PeopleDomain {
 		}
 		// you can have a look to the graph database with Neo4Js graph database browser,
 		// in order to see the created domain graph.
+		// Or see: src/main/resources/people_domain.gif.
 		// Note: By default the maximum number of nodes displayed in the browser is limited to 25.
 		// You have to change the browser query to see all created nodes.
 		// E.g. to 'MATCH n RETURN n LIMIT 100'
@@ -128,4 +144,37 @@ public class PeopleDomain {
 		return;
 	}
 
+	/**
+	 * demonstrates how to retrieve domain information.
+	 */
+	public static void retrieveDomainInformation() {
+		List<JcError> errors;
+		
+		// Answer the names of available domains.
+		List<String> available = DomainInformation.availableDomains(Config.getDBAccess());
+		
+		// Create a DomainInformation object for a certain domain.
+		DomainInformation di = DomainInformation.forDomain(Config.getDBAccess(), Config.domainName);
+		
+		// Answer a list of DomainObjectTypes stored in the domain graph
+		List<DomainObjectType> types = di.getDomainObjectTypes();
+		
+		DomainObjectType type = types.get(0);
+
+		// You can ask a DomainObjectType for its type name
+		// i.e. the fully qualified name of the java type
+		String typeName = type.getTypeName();
+
+		// You can ask a DomainObjectType for the
+		// label of nodes to which domain objects
+		// of that type are mapped
+		String label = type.getNodeLabel();
+
+		// You can retrieve the java type (Class)
+		// from a DomainObjectType.
+		// Note: this may raise a ClassNotFoundException
+		Class<?> jType = type.getType();
+		
+		return;
+	}
 }
