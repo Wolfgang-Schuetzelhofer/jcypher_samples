@@ -18,6 +18,7 @@ package iot.jcypher.samples.domain.people.util;
 
 import iot.jcypher.samples.domain.people.model.Address;
 import iot.jcypher.samples.domain.people.model.Area;
+import iot.jcypher.samples.domain.people.model.Company;
 import iot.jcypher.samples.domain.people.model.Person;
 import iot.jcypher.samples.domain.people.model.Subject;
 
@@ -65,8 +66,12 @@ public class CompareUtil {
 			if (o_2 != null)
 				return false;
 		}
+		if (!o_1.getClass().equals(o_2.getClass()))
+			return false;
 		if (o_1 instanceof Person)
 			return CompareUtil.equalsPerson((Person)o_1, (Person)o_2, acs);
+		else if (o_1 instanceof Company)
+			return CompareUtil.equalsCompany((Company)o_1, (Company)o_2, acs);
 		else if (o_1 instanceof Address)
 			return CompareUtil.equalsAddress((Address)o_1, (Address)o_2, acs);
 		else if (o_1 instanceof Area)
@@ -75,6 +80,37 @@ public class CompareUtil {
 			return CompareUtil.equalsList((List<?>)o_1, (List<?>)o_2, acs);
 		else
 			return o_1.equals(o_2);
+	}
+	
+	private static boolean equalsCompany(Company o_1, Company o_2, List<AlreadyCompared> alreadyCompareds) {
+		List<AlreadyCompared> acs = alreadyCompareds;
+		if (acs == null)
+			acs = new ArrayList<AlreadyCompared>();
+		AlreadyCompared ac = AlreadyCompared.alreadyCompared(o_1, o_2, acs);
+		if (ac != null) // avoid infinite loops
+			return ac.getResult();
+		
+		ac = new AlreadyCompared(o_1, o_2);
+		acs.add(ac);
+		
+		ac.setResult(true);
+		
+		if (o_1 == o_2)
+			return true;
+		if (o_1 == null) {
+			if (o_2 != null)
+				return ac.setResult(false);
+		}
+		if (o_1.getClass() != o_2.getClass())
+			return ac.setResult(false);
+		if (!equalsSubject(o_1, o_2, acs))
+			return ac.setResult(false);
+		if (o_1.getName() == null) {
+			if (o_2.getName() != null)
+				return ac.setResult(false);
+		} else if (!o_1.getName().equals(o_2.getName()))
+			return ac.setResult(false);
+		return true;
 	}
 	
 	private static boolean equalsPerson(Person o_1, Person o_2, List<AlreadyCompared> alreadyCompareds) {
@@ -111,6 +147,11 @@ public class CompareUtil {
 			if (o_2.getLastName() != null)
 				return ac.setResult(false);
 		} else if (!o_1.getLastName().equals(o_2.getLastName()))
+			return ac.setResult(false);
+		if (o_1.getEyeColor() == null) {
+			if (o_2.getEyeColor() != null)
+				return ac.setResult(false);
+		} else if (!o_1.getEyeColor().equals(o_2.getEyeColor()))
 			return ac.setResult(false);
 		if (o_1.getMother() == null) {
 			if (o_2.getMother() != null)

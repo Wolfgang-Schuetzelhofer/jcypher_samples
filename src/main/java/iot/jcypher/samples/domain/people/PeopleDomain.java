@@ -177,4 +177,11 @@ public class PeopleDomain {
 		
 		return;
 	}
+	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 */
+	public static void performDomainQueries() {
+		
+	}
 }

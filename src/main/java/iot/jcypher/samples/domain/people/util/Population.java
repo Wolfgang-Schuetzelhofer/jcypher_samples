@@ -92,15 +92,15 @@ public class Population {
 		Address smith_address = new Address("Market Street", 20);
 		smith_address.setArea(sanFrancisco);
 		
-		Person john_smith = new Person("John", "Smith", Gender.MALE);
+		Person john_smith = new Person("John", "Smith", Gender.MALE, "brown");
 		john_smith.getPointsOfContact().add(smith_address);
-		Person caroline_smith = new Person("Caroline", "Smith", Gender.FEMALE);
+		Person caroline_smith = new Person("Caroline", "Smith", Gender.FEMALE, "green");
 		caroline_smith.getPointsOfContact().add(smith_address);
-		Person angie_smith = new Person("Angelina", "Smith", Gender.FEMALE);
+		Person angie_smith = new Person("Angelina", "Smith", Gender.FEMALE, "blue");
 		angie_smith.getPointsOfContact().add(smith_address);
 		angie_smith.setMother(caroline_smith);
 		angie_smith.setFather(john_smith);
-		Person jery_smith = new Person("Jeremy", "Smith", Gender.MALE);
+		Person jery_smith = new Person("Jeremy", "Smith", Gender.MALE, "brown");
 		jery_smith.getPointsOfContact().add(smith_address);
 		jery_smith.setMother(caroline_smith);
 		jery_smith.setFather(john_smith);
@@ -115,11 +115,11 @@ public class Population {
 		Address berghammer_address = new Address("Hochstrasse", 4);
 		berghammer_address.setArea(munic);
 		
-		Person hans_berghammer = new Person("Hans", "Berghammer", Gender.MALE);
+		Person hans_berghammer = new Person("Hans", "Berghammer", Gender.MALE, "blue");
 		hans_berghammer.getPointsOfContact().add(berghammer_address);
-		Person gerda_berhammer = new Person("Gerda", "Berghammer", Gender.FEMALE);
+		Person gerda_berhammer = new Person("Gerda", "Berghammer", Gender.FEMALE, "green");
 		gerda_berhammer.getPointsOfContact().add(berghammer_address);
-		Person christa_berhammer = new Person("Christa", "Berghammer", Gender.FEMALE);
+		Person christa_berhammer = new Person("Christa", "Berghammer", Gender.FEMALE, "brown");
 		christa_berhammer.getPointsOfContact().add(berghammer_address);
 		christa_berhammer.setMother(gerda_berhammer);
 		christa_berhammer.setFather(hans_berghammer);
@@ -132,21 +132,24 @@ public class Population {
 	private void createMore(List<Object> domainObjects) {
 		Address watson_address = new Address("Broadway", 53);
 		watson_address.setArea(newYorkCity);
-		Person jim_watson = new Person("Jim", "Watson", Gender.MALE);
+		Person jim_watson = new Person("Jim", "Watson", Gender.MALE, "brown");
 		jim_watson.getPointsOfContact().add(watson_address);
 		
 		Address clark_address = new Address("Pearl Street", 124);
 		clark_address.setArea(newYorkCity);
-		Person sarah_clark = new Person("Sarah", "Clark", Gender.FEMALE);
-		sarah_clark.getPointsOfContact().add(clark_address);
+		Person angie_clark = new Person("Angelina", "Clark", Gender.FEMALE, "blue");
+		angie_clark.getPointsOfContact().add(clark_address);
 		
 		Address maier_address = new Address("Lackner Gasse", 12);
 		maier_address.setArea(vienna_17);
-		Person herbert_maier = new Person("Herbert", "Maier", Gender.MALE);
+		Person herbert_maier = new Person("Herbert", "Maier", Gender.MALE, "green");
 		herbert_maier.getPointsOfContact().add(maier_address);
 		
+		Person sarah_maier = new Person("Sarah", "Maier", Gender.FEMALE, "blue");
+		sarah_maier.getPointsOfContact().add(maier_address);
+		
 		domainObjects.add(jim_watson);
-		domainObjects.add(sarah_clark);
+		domainObjects.add(angie_clark);
 		domainObjects.add(herbert_maier);
 	}
 }

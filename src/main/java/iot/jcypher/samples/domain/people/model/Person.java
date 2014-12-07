@@ -21,6 +21,7 @@ public class Person extends Subject {
 	private String firstName;
 	private String lastName;
 	private Gender gender;
+	private String eyeColor;
 	private Person father;
 	private Person mother;
 	
@@ -28,11 +29,13 @@ public class Person extends Subject {
 		super();
 	}
 
-	public Person(String firstName, String lastName, Gender gender) {
+	public Person(String firstName, String lastName, Gender gender,
+			String eyeColor) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.gender = gender;
+		this.eyeColor = eyeColor;
 	}
 
 	public String getFirstName() {
@@ -45,6 +48,10 @@ public class Person extends Subject {
 
 	public Gender getGender() {
 		return gender;
+	}
+
+	public String getEyeColor() {
+		return eyeColor;
 	}
 
 	public Person getFather() {
