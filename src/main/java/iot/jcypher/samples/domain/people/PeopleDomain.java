@@ -21,9 +21,13 @@ import iot.jcypher.domain.DomainInformation;
 import iot.jcypher.domain.IDomainAccess;
 import iot.jcypher.domain.SyncInfo;
 import iot.jcypher.domain.DomainInformation.DomainObjectType;
+import iot.jcypher.domainquery.DomainQuery;
+import iot.jcypher.domainquery.DomainQueryResult;
+import iot.jcypher.domainquery.api.DomainObjectMatch;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.result.JcResultException;
 import iot.jcypher.samples.domain.people.graph_access.Config;
+import iot.jcypher.samples.domain.people.model.Person;
 import iot.jcypher.samples.domain.people.model.Subject;
 import iot.jcypher.samples.domain.people.util.CompareUtil;
 import iot.jcypher.samples.domain.people.util.Population;
@@ -36,10 +40,13 @@ public class PeopleDomain {
 	public static void main(String[] args) {
 		
 		// demonstrates how to store and retrieve domain objects.
-		storeAndRetrieveDomainObjects();
+//		storeAndRetrieveDomainObjects();
 		
 		// demonstrates how to retrieve domain information.
 		retrieveDomainInformation();
+		
+		// demonstrates how to formulate and execute domain queries.
+		performDomainQueries();
 		return;
 	}
 	
@@ -183,5 +190,68 @@ public class PeopleDomain {
 	 */
 	public static void performDomainQueries() {
 		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Query 01 *************************************/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> smithsMatch = q.createMatch(Person.class);
+		// define a predicate expression in form of a WHERE clause
+		// which constrains the set of Persons
+		q.WHERE(smithsMatch.atttribute("lastName")).EQUALS("Smith");
+		
+		// you need to execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> smiths = result.resultOf(smithsMatch);
+		/*****************************************************/
+		
+		/****** Query 02 *************************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> j_smithMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// John Smith only
+		q.WHERE(j_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.WHERE(j_smithMatch.atttribute("firstName")).EQUALS("John");
+		
+		// Note: Consecutive WHERE clauses are 'AND-ed' by default.
+		// If you want to 'OR' them you need to explicitly separate them
+		// by OR(); --> see next query
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> j_smith = result.resultOf(j_smithMatch);
+		/*****************************************************/
+		
+		/****** Query 03 *************************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> a_j_smithMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// Angelina and Jeremy Smith only
+		q.WHERE(a_j_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.BR_OPEN();
+			q.WHERE(a_j_smithMatch.stringAtttribute("firstName")).EQUALS("Angelina");
+			q.OR();
+			q.WHERE(a_j_smithMatch.stringAtttribute("firstName")).EQUALS("Jeremy");
+		q.BR_CLOSE();
+		
+		// Note: You can define blocks by using BR_OPEN (for bracket open)
+		// and BR_CLOSE (for bracket close). You can nest blocks arbitrarily deep.
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> a_j_smith = result.resultOf(a_j_smithMatch);
+		/*****************************************************/
+		
+		return;
 	}
 }
