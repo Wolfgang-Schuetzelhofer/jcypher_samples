@@ -40,7 +40,7 @@ public class PeopleDomain {
 	public static void main(String[] args) {
 		
 		// demonstrates how to store and retrieve domain objects.
-//		storeAndRetrieveDomainObjects();
+		storeAndRetrieveDomainObjects();
 		
 		// demonstrates how to retrieve domain information.
 		retrieveDomainInformation();
@@ -250,6 +250,60 @@ public class PeopleDomain {
 		result = q.execute();
 		// retrieve the list of matching domain objects
 		List<Person> a_j_smith = result.resultOf(a_j_smithMatch);
+		/*****************************************************/
+		
+		/****** Query 04 *************************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create DomainObjectMatches
+		DomainObjectMatch<Person> a_smithMatch = q.createMatch(Person.class);
+		DomainObjectMatch<Person> eyeColorMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// Angelina Smith only
+		q.WHERE(a_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.WHERE(a_smithMatch.stringAtttribute("firstName")).EQUALS("Angelina");
+		
+		// Now constrain the set to be matched by 'eyeColorMatch'
+		// to contain persons with the same eye color as Angelina Smith
+		q.WHERE(eyeColorMatch.atttribute("eyeColor")).EQUALS(a_smithMatch.atttribute("eyeColor"));
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> a_smith = result.resultOf(a_smithMatch);
+		List<Person> all_with_a_smith_eyeColor = result.resultOf(eyeColorMatch);
+		/*****************************************************/
+		
+		/****** Query 05 *************************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create DomainObjectMatches
+		DomainObjectMatch<Person> set_1Match = q.createMatch(Person.class);
+		DomainObjectMatch<Person> set_2Match = q.createMatch(Person.class);
+		DomainObjectMatch<Person> intersectionMatch = q.createMatch(Person.class);
+		// Constrain set_1 to
+		// a set with all smiths and christa berghammer
+		q.WHERE(set_1Match.atttribute("lastName")).EQUALS("Smith");
+		q.OR();
+		q.BR_OPEN();
+			q.WHERE(set_1Match.atttribute("lastName")).EQUALS("Berghammer");
+			q.WHERE(set_1Match.atttribute("firstName")).EQUALS("Christa");
+		q.BR_CLOSE();
+		
+		// Constrain set_2 to
+		// a set with all berghammers
+		q.WHERE(set_2Match.atttribute("lastName")).EQUALS("Berghammer");
+		
+		// the intersction of both set_1 and set_2
+		// it will contain christa berghammer only
+		q.WHERE(intersectionMatch).IN(set_1Match);
+		q.WHERE(intersectionMatch).IN(set_2Match);
+		
+		result = q.execute();
+		List<Person> set_1 = result.resultOf(set_1Match);
+		List<Person> set_2 = result.resultOf(set_2Match);
+		List<Person> intersection = result.resultOf(intersectionMatch);
 		/*****************************************************/
 		
 		return;

@@ -19,6 +19,7 @@ package iot.jcypher.samples.domain.people.util;
 import iot.jcypher.samples.domain.people.model.Address;
 import iot.jcypher.samples.domain.people.model.Area;
 import iot.jcypher.samples.domain.people.model.AreaType;
+import iot.jcypher.samples.domain.people.model.Company;
 import iot.jcypher.samples.domain.people.model.Gender;
 import iot.jcypher.samples.domain.people.model.Person;
 
@@ -34,7 +35,7 @@ public class Population {
 	private Area sanFrancisco;
 	private Area europe;
 	private Area germany;
-	private Area munic;
+	private Area munich;
 	private Area newYork;
 	private Area newYorkCity;
 	private Area austria;
@@ -56,6 +57,7 @@ public class Population {
 		createSmithFamily(domainObjects);
 		createBerghammers(domainObjects);
 		createMore(domainObjects);
+		createCompanies(domainObjects);
 		
 		return domainObjects;
 	}
@@ -74,8 +76,8 @@ public class Population {
 		europe.setPartOf(earth);
 		germany = new Area("2", "Germany", AreaType.COUNTRY);
 		germany.setPartOf(europe);
-		munic = new Area(null, "Munic", AreaType.CITY);
-		munic.setPartOf(germany);
+		munich = new Area(null, "Munic", AreaType.CITY);
+		munich.setPartOf(germany);
 		newYork = new Area(null, "New York", AreaType.STATE);
 		newYork.setPartOf(usa);
 		newYorkCity = new Area(null, "New York City", AreaType.CITY);
@@ -113,7 +115,7 @@ public class Population {
 
 	private void createBerghammers(List<Object> domainObjects) {
 		Address berghammer_address = new Address("Hochstrasse", 4);
-		berghammer_address.setArea(munic);
+		berghammer_address.setArea(munich);
 		
 		Person hans_berghammer = new Person("Hans", "Berghammer", Gender.MALE, "blue");
 		hans_berghammer.getPointsOfContact().add(berghammer_address);
@@ -151,5 +153,25 @@ public class Population {
 		domainObjects.add(jim_watson);
 		domainObjects.add(angie_clark);
 		domainObjects.add(herbert_maier);
+		domainObjects.add(sarah_maier);
+	}
+	
+	private void createCompanies(List<Object> domainObjects) {
+		Address globCom_address = new Address("Kearny Street", 29);
+		globCom_address.setArea(sanFrancisco);
+		
+		Company globCom = new Company();
+		globCom.setName("Global Company");
+		globCom.getPointsOfContact().add(globCom_address);
+		
+		Address mTecCom_address = new Address("Schiller Strasse", 15);
+		mTecCom_address.setArea(munich);
+		
+		Company mTecCom = new Company();
+		mTecCom.setName("MunichTec Limited");
+		mTecCom.getPointsOfContact().add(mTecCom_address);
+		
+		domainObjects.add(globCom);
+		domainObjects.add(mTecCom);
 	}
 }
