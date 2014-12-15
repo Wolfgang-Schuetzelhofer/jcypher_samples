@@ -18,9 +18,10 @@ package iot.jcypher.samples.domain.people;
 
 import iot.jcypher.database.IDBAccess;
 import iot.jcypher.domain.DomainInformation;
+import iot.jcypher.domain.DomainInformation.DomainObjectType;
 import iot.jcypher.domain.IDomainAccess;
 import iot.jcypher.domain.SyncInfo;
-import iot.jcypher.domain.DomainInformation.DomainObjectType;
+import iot.jcypher.domainquery.CountQueryResult;
 import iot.jcypher.domainquery.DomainQuery;
 import iot.jcypher.domainquery.DomainQueryResult;
 import iot.jcypher.domainquery.api.DomainObjectMatch;
@@ -238,9 +239,9 @@ public class PeopleDomain {
 		// Angelina and Jeremy Smith only
 		q.WHERE(a_j_smithMatch.atttribute("lastName")).EQUALS("Smith");
 		q.BR_OPEN();
-			q.WHERE(a_j_smithMatch.stringAtttribute("firstName")).EQUALS("Angelina");
+			q.WHERE(a_j_smithMatch.atttribute("firstName")).EQUALS("Angelina");
 			q.OR();
-			q.WHERE(a_j_smithMatch.stringAtttribute("firstName")).EQUALS("Jeremy");
+			q.WHERE(a_j_smithMatch.atttribute("firstName")).EQUALS("Jeremy");
 		q.BR_CLOSE();
 		
 		// Note: You can define blocks by using BR_OPEN (for bracket open)
@@ -262,7 +263,7 @@ public class PeopleDomain {
 		// Constrain the set of Persons to contain
 		// Angelina Smith only
 		q.WHERE(a_smithMatch.atttribute("lastName")).EQUALS("Smith");
-		q.WHERE(a_smithMatch.stringAtttribute("firstName")).EQUALS("Angelina");
+		q.WHERE(a_smithMatch.atttribute("firstName")).EQUALS("Angelina");
 		
 		// Now constrain the set to be matched by 'eyeColorMatch'
 		// to contain persons with the same eye color as Angelina Smith
@@ -304,6 +305,44 @@ public class PeopleDomain {
 		List<Person> set_1 = result.resultOf(set_1Match);
 		List<Person> set_2 = result.resultOf(set_2Match);
 		List<Person> intersection = result.resultOf(intersectionMatch);
+		/*****************************************************/
+		
+		/****** Sorting Result Sets + Pagination **********/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create DomainObjectMatches
+		DomainObjectMatch<Person> personsMatch = q.createMatch(Person.class);
+		// Specify Pagination (offset + count)
+		personsMatch.setPage(1, 5);
+		// Specify sorting for the result set.
+		// First: All persons are sorted by their last name (ascending)
+		// Second: Having the same last name, persons are sorted
+		// by their first name (descending)
+		q.ORDER(personsMatch).BY("lastName");
+		q.ORDER(personsMatch).BY("firstName").DESCENDING();
+		
+		result = q.execute();
+		List<Person> sortedPersons = result.resultOf(personsMatch);
+		/*****************************************************/
+		
+		/****** Change Pagination *************************/
+//		personsMatch.setPage(7, 3);
+//		// Retrieve the result set again.
+//		sortedPersons = result.resultOf(personsMatch);
+		/*****************************************************/
+		
+		/****** Retrieve number of matching objects ********/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> smithMatch = q.createMatch(Person.class);
+		// define a predicate expression in form of a WHERE clause
+		// which constrains the set of Persons
+		q.WHERE(smithMatch.atttribute("lastName")).EQUALS("Smith");
+		
+		// Retrieve the number of matching objects
+		CountQueryResult countResult = q.executeCount();
+		long numberOfSmiths = countResult.countOf(smithMatch);
 		/*****************************************************/
 		
 		return;
