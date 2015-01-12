@@ -1,5 +1,5 @@
 /************************************************************************
- * Copyright (c) 2014 IoT-Solutions e.U.
+ * Copyright (c) 2014-2015 IoT-Solutions e.U.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@ public class EContact implements PointOfContact {
 	private EContactType type;
 	private String eAddress;
 	
+	public EContact() {
+		super();
+	}
+
 	public EContact(EContactType type, String eAddress) {
 		super();
 		this.type = type;

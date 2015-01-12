@@ -1,5 +1,5 @@
 /************************************************************************
- * Copyright (c) 2014 IoT-Solutions e.U.
+ * Copyright (c) 2014-2015 IoT-Solutions e.U.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package iot.jcypher.samples.domain.people.util;
 import iot.jcypher.samples.domain.people.model.Address;
 import iot.jcypher.samples.domain.people.model.Area;
 import iot.jcypher.samples.domain.people.model.Company;
+import iot.jcypher.samples.domain.people.model.EContact;
 import iot.jcypher.samples.domain.people.model.Person;
 import iot.jcypher.samples.domain.people.model.Subject;
 
@@ -74,6 +75,8 @@ public class CompareUtil {
 			return CompareUtil.equalsCompany((Company)o_1, (Company)o_2, acs);
 		else if (o_1 instanceof Address)
 			return CompareUtil.equalsAddress((Address)o_1, (Address)o_2, acs);
+		else if (o_1 instanceof EContact)
+			return CompareUtil.equalsEContact((EContact)o_1, (EContact)o_2, acs);
 		else if (o_1 instanceof Area)
 			return CompareUtil.equalsArea((Area)o_1, (Area)o_2, acs);
 		else if (o_1 instanceof List<?>)
@@ -244,6 +247,37 @@ public class CompareUtil {
 			if (o_2.getStreet() != null)
 				return ac.setResult(false);
 		} else if (!o_1.getStreet().equals(o_2.getStreet()))
+			return ac.setResult(false);
+		return true;
+	}
+	
+	private static boolean equalsEContact(EContact o_1, EContact o_2, List<AlreadyCompared> alreadyCompareds) {
+		List<AlreadyCompared> acs = alreadyCompareds;
+		if (acs == null)
+			acs = new ArrayList<AlreadyCompared>();
+		AlreadyCompared ac = AlreadyCompared.alreadyCompared(o_1, o_2, acs);
+		if (ac != null) // avoid infinite loops
+			return ac.getResult();
+		
+		ac = new AlreadyCompared(o_1, o_2);
+		acs.add(ac);
+		
+		ac.setResult(true);
+		
+		if (o_1 == o_2)
+			return true;
+		if (o_1 == null) {
+			if (o_2 != null)
+				return ac.setResult(false);
+		}
+		if (o_1.getClass() != o_2.getClass())
+			return ac.setResult(false);
+		if (o_1.geteAddress() == null) {
+			if (o_2.geteAddress() != null)
+				return ac.setResult(false);
+		} else if (!o_1.geteAddress().equals(o_2.geteAddress()))
+			return ac.setResult(false);
+		if (o_1.getType() != o_2.getType())
 			return ac.setResult(false);
 		return true;
 	}
