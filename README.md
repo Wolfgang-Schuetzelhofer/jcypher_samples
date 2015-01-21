@@ -1,4 +1,4 @@
-jcypher_samples
+JCypher Samples
 ===============
 
 The JCypher Samples project was introduced together with release 2.0.0 of JCypher.
