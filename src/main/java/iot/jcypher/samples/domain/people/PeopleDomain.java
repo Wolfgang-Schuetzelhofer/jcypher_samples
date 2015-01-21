@@ -28,18 +28,23 @@ import iot.jcypher.domainquery.api.DomainObjectMatch;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.result.JcResultException;
 import iot.jcypher.samples.domain.people.graph_access.Config;
+import iot.jcypher.samples.domain.people.model.Address;
+import iot.jcypher.samples.domain.people.model.Area;
+import iot.jcypher.samples.domain.people.model.AreaType;
 import iot.jcypher.samples.domain.people.model.Person;
 import iot.jcypher.samples.domain.people.model.Subject;
 import iot.jcypher.samples.domain.people.util.CompareUtil;
-import iot.jcypher.samples.domain.people.util.Population;
 import iot.jcypher.samples.domain.people.util.Util;
+import iot.jcypher.util.QueriesPrintObserver;
+import iot.jcypher.util.QueriesPrintObserver.ContentToObserve;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class PeopleDomain {
 
 	public static void main(String[] args) {
-		
+
 		// demonstrates how to store and retrieve domain objects.
 		storeAndRetrieveDomainObjects();
 		
@@ -47,7 +52,12 @@ public class PeopleDomain {
 		retrieveDomainInformation();
 		
 		// demonstrates how to formulate and execute domain queries.
-		performDomainQueries();
+		// Part 1: Predicate Expressions
+		performDomainQueries_PredicateExpressions();
+		
+		// demonstrates how to formulate and execute domain queries.
+		// Part 1: Traversal Expressions
+		performDomainQueries_TraversalExpressions();
 		return;
 	}
 	
@@ -188,8 +198,9 @@ public class PeopleDomain {
 	
 	/**
 	 * demonstrates how to formulate and perform domain queries.
+	 * Part 1: Predicate Expressions.
 	 */
-	public static void performDomainQueries() {
+	public static void performDomainQueries_PredicateExpressions() {
 		
 		IDomainAccess domainAccess = Config.createDomainAccess();
 		
@@ -276,7 +287,7 @@ public class PeopleDomain {
 		List<Person> all_with_a_smith_eyeColor = result.resultOf(eyeColorMatch);
 		/*****************************************************/
 		
-		/****** Query 05 *************************************/
+		/****** Query 05 **** calculate intersection *******/
 		// create a DomainQuery object
 		q = domainAccess.createQuery();
 		// create DomainObjectMatches
@@ -326,9 +337,9 @@ public class PeopleDomain {
 		/*****************************************************/
 		
 		/****** Change Pagination *************************/
-//		personsMatch.setPage(7, 3);
-//		// Retrieve the result set again.
-//		sortedPersons = result.resultOf(personsMatch);
+		personsMatch.setPage(7, 3);
+		// Retrieve the result set again.
+		sortedPersons = result.resultOf(personsMatch);
 		/*****************************************************/
 		
 		/****** Retrieve number of matching objects ********/
@@ -343,6 +354,161 @@ public class PeopleDomain {
 		// Retrieve the number of matching objects
 		CountQueryResult countResult = q.executeCount();
 		long numberOfSmiths = countResult.countOf(smithMatch);
+		/*****************************************************/
+		
+		return;
+	}
+	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 * Part 2: Traversal Expressions.
+	 */
+	public static void performDomainQueries_TraversalExpressions() {
+		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Traversal 01 ********************************/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> j_smithMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// 'John Smith' only
+		q.WHERE(j_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.WHERE(j_smithMatch.atttribute("firstName")).EQUALS("John");
+		
+		// Traverse forward, start with 'John Smith'
+		// (j_smithMatch is constraint to match 'John Smith' only),
+		// navigate attribute 'pointsOfContact',
+		// end matching objects of type Address.
+		DomainObjectMatch<Address> j_smith_AddressesMatch =
+				q.TRAVERSE_FROM(j_smithMatch).FORTH("pointsOfContact").TO(Address.class);
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		// (i.e. all addresses of 'John Smith')
+		List<Address> j_smith_Addresses = result.resultOf(j_smith_AddressesMatch);
+		/*****************************************************/
+		
+		/****** Traversal 02 ********************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Subject
+		DomainObjectMatch<Subject> smith_globcomMatch = q.createMatch(Subject.class);
+		
+		// Constrain the set of Subjects to contain
+		// 'John Smith' and 'Global Company' only
+		q.WHERE(smith_globcomMatch.atttribute("name")).EQUALS("Global Company");
+		q.OR();
+		q.BR_OPEN();
+			q.WHERE(smith_globcomMatch.atttribute("lastName")).EQUALS("Smith");
+			q.WHERE(smith_globcomMatch.atttribute("firstName")).EQUALS("John");
+		q.BR_CLOSE();
+		
+		// Start with the set containing 'John Smith' and 'Global Company',
+		// navigate forward via attribute 'pointsOfContact'
+		//          (defined in abstract super class 'Subject'),
+		// navigate forward via attribute 'area',
+		// end matching objects of type Area
+		// (these are the immediate areas referenced by addresses
+		// possibly: Cities, Urban Districts, Villages, ...).
+		DomainObjectMatch<Area> immediateAreasMatch =
+			q.TRAVERSE_FROM(smith_globcomMatch).FORTH("pointsOfContact")
+				.FORTH("area").TO(Area.class);
+		
+		// Start with the set of immediate areas (retrieved before),
+		// navigate forward via attribute 'partOf'.
+		// ( DISTANCE(1, -1) means that
+		// all areas reachable from one hop up to an arbitrary number of hops
+		// via attribute 'partOf' will be collected),
+		// end matching objects of type Area.
+		DomainObjectMatch<Area> areasMatch =
+			q.TRAVERSE_FROM(immediateAreasMatch).FORTH("partOf")
+				.DISTANCE(1, -1).TO(Area.class);
+
+		// create a DomainObjectMatch for objects of type Area
+		DomainObjectMatch<Area> citiesMatch = q.createMatch(Area.class);
+		
+		// build 'citiesMatch' as the union of 'immediateAreasMatch'
+		// and 'areasMatch' (then you have a set containing all areas
+		// reachable from the relevant addresses),
+		// further constrain the set to only contain areas of type 'CITY'.
+		q.BR_OPEN();
+			q.WHERE(citiesMatch).IN(immediateAreasMatch);
+			q.OR();
+			q.WHERE(citiesMatch).IN(areasMatch);
+		q.BR_CLOSE();
+		q.WHERE(citiesMatch.atttribute("areaType")).EQUALS(AreaType.CITY);
+		
+		// execute the query
+		result = q.execute();
+		
+		// retrieve the list of matching domain objects.
+		// It will contain the cities in which either 'John Smith' or 'Global Company'
+		// have an address.
+		List<Area> cities = result.resultOf(citiesMatch);
+		/*****************************************************/
+		
+		/****** Backward Traversal *************************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Address
+		DomainObjectMatch<Address> addressMatch = q.createMatch(Address.class);
+		
+		// Constrain the set of Addresses to contain
+		// 'Market Street 20' only
+		q.WHERE(addressMatch.atttribute("street")).EQUALS("Market Street");
+		q.WHERE(addressMatch.atttribute("number")).EQUALS(20);
+		
+		// Traverse backward, start with 'Market Street 20'
+		// (addressMatch is constraint to match 'Market Street 20' only),
+		// navigate attribute 'pointsOfContact',
+		// end matching objects of type Person.
+		DomainObjectMatch<Person> residentsMatch =
+			q.TRAVERSE_FROM(addressMatch).BACK("pointsOfContact")
+				.TO(Person.class);
+		// order the result by attribute 'firstName' ascending
+		q.ORDER(residentsMatch).BY("firstName");
+		
+		// execute the query
+		result = q.execute();
+		
+		// retrieve the list of matching domain objects.
+		// It will contain the all residents of 'Market Street 20'
+		// (ordered ascending).
+		List<Person> residents = result.resultOf(residentsMatch);
+		/*****************************************************/
+		
+		/****** Forward-Backward Traversal ***************/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		j_smithMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// John Smith only
+		q.WHERE(j_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.WHERE(j_smithMatch.atttribute("firstName")).EQUALS("John");
+		
+		// Start with 'John Smith'
+		// (j_smithMatch is constraint to match 'John Smith' only),
+		// navigate forward via attribute 'pointsOfContact',
+		// this will lead to 'John Smith's' Address(es),
+		// then navigate backward via attribute 'pointsOfContact',
+		// end matching objects of type Person.
+		// This will lead to all other persons living at 'John Smith's' Address(es).
+		DomainObjectMatch<Person> j_smith_residentsMatch =
+			q.TRAVERSE_FROM(j_smithMatch).FORTH("pointsOfContact")
+				.BACK("pointsOfContact").TO(Person.class);
+		
+		// execute the query
+		result = q.execute();
+		
+		// retrieve the list of matching domain objects.
+		// It will contain all other persons living at 'John Smith's' Address(es).
+		List<Person> j_smith_residents = result.resultOf(j_smith_residentsMatch);
 		/*****************************************************/
 		
 		return;
