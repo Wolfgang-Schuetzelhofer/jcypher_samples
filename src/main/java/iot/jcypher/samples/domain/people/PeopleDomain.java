@@ -67,7 +67,7 @@ public class PeopleDomain {
 	public static void storeAndRetrieveDomainObjects() {
 		List<JcError> errors;
 		
-		// A utility class which simply creates a sample population.
+		// A utility class which creates a sample population.
 		Population domainPopulator = new Population();
 		
 		// Create the population,
@@ -77,7 +77,7 @@ public class PeopleDomain {
 		// Initially clear the database.
 		// Note: On how to create an IDBAccess (access to a graph database)
 		// and an IDomainAccess (access to a domain within a graph database)
-		// hava a look at the 'Config class'.
+		// hava a look at the 'Config class' in the 'graph_access' subpackage.
 		IDBAccess dbAccess = Config.getDBAccess();
 		errors = dbAccess.clearDatabase();
 		if (errors.size() > 0) {
