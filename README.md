@@ -3,7 +3,7 @@ JCypher Samples
 
 Provides samples for JCypher.
 ## Documentation and Getting Started
-For documentation and on how to get started pelase have a look at the wiki:
+For documentation and on how to get started please have a look at the wiki:
 https://github.com/Wolfgang-Schuetzelhofer/jcypher_samples/wiki
 
 ## License & Copyright
