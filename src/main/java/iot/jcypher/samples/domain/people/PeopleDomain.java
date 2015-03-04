@@ -513,4 +513,37 @@ public class PeopleDomain {
 		
 		return;
 	}
+	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 * Part 3: Collection Expressions.
+	 */
+	public static void performDomainQueries_CollectionExpressions() {
+		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Select 01 ********************************/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		// By default it will match all persons
+		DomainObjectMatch<Person> personMatch = q.createMatch(Person.class);
+
+		// Select from all persons
+		// 'John Smith' only
+		DomainObjectMatch<Person> j_smithMatch =
+				q.SELECT_FROM(personMatch).ELEMENTS(
+						q.WHERE(personMatch.atttribute("lastName")).EQUALS("Smith"),
+						q.WHERE(personMatch.atttribute("firstName")).EQUALS("John")
+				);
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> j_smith = result.resultOf(j_smithMatch);
+		/*****************************************************/
+		
+		return;
+	}
+		
 }
