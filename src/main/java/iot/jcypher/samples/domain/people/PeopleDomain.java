@@ -46,18 +46,23 @@ public class PeopleDomain {
 	public static void main(String[] args) {
 
 		// demonstrates how to store and retrieve domain objects.
-		storeAndRetrieveDomainObjects();
+//		storeAndRetrieveDomainObjects();
 		
 		// demonstrates how to retrieve domain information.
-		retrieveDomainInformation();
+//		retrieveDomainInformation();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 1: Predicate Expressions
-		performDomainQueries_PredicateExpressions();
+//		performDomainQueries_PredicateExpressions();
 		
 		// demonstrates how to formulate and execute domain queries.
-		// Part 1: Traversal Expressions
-		performDomainQueries_TraversalExpressions();
+		// Part 2: Traversal Expressions
+//		performDomainQueries_TraversalExpressions();
+		
+		// demonstrates how to formulate and execute domain queries.
+		// Part 3: Collection Expressions
+		performDomainQueries_CollectionExpressions();
+		
 		return;
 	}
 	
@@ -522,7 +527,7 @@ public class PeopleDomain {
 		
 		IDomainAccess domainAccess = Config.createDomainAccess();
 		
-		/****** Select 01 ********************************/
+		/****** Select by specifying a constraint on the source set ****/
 		// create a DomainQuery object
 		DomainQuery q = domainAccess.createQuery();
 		// Create a DomainObjectMatch for objects of type Person.
@@ -533,6 +538,7 @@ public class PeopleDomain {
 		// 'John Smith' only
 		DomainObjectMatch<Person> j_smithMatch =
 				q.SELECT_FROM(personMatch).ELEMENTS(
+						// predicate expressions specify the selection
 						q.WHERE(personMatch.atttribute("lastName")).EQUALS("Smith"),
 						q.WHERE(personMatch.atttribute("firstName")).EQUALS("John")
 				);
@@ -541,6 +547,93 @@ public class PeopleDomain {
 		DomainQueryResult result = q.execute();
 		// retrieve the list of matching domain objects
 		List<Person> j_smith = result.resultOf(j_smithMatch);
+		/*****************************************************/
+		
+		/****** Select by specifying a constraint on a derived  set ****/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		// By default it will match all persons
+		personMatch = q.createMatch(Person.class);
+		
+		// select all person's addresses by means
+		// of a traversal expression
+		DomainObjectMatch<Address> addressMatch =
+				q.TRAVERSE_FROM(personMatch).FORTH("pointsOfContact").TO(Address.class);
+
+		// Select from all persons
+		// those that live on market street
+		DomainObjectMatch<Person> onMarketStreetMatch =
+				q.SELECT_FROM(personMatch).ELEMENTS(
+						q.WHERE(addressMatch.atttribute("street")).EQUALS("Market Street")
+				);
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> onMarketStreet = result.resultOf(onMarketStreetMatch);
+		/*****************************************************/
+		
+		/****** Select using the CONTAINS operation ****/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		// By default it will match all persons
+		personMatch = q.createMatch(Person.class);
+		DomainObjectMatch<Area> europeMatch = q.createMatch(Area.class);
+		
+		// constrain the set of areas
+		// to contain europe only
+		q.WHERE(europeMatch.atttribute("name")).EQUALS("Europe");
+		
+		// select all areas which are reachable
+		// from all person's addresses by means
+		// of a traversal expression
+		DomainObjectMatch<Area> areasMatch =
+				q.TRAVERSE_FROM(personMatch).FORTH("pointsOfContact")
+				.FORTH("area")
+				.FORTH("partOf").DISTANCE(1, -1)
+				.TO(Area.class);
+
+		// Select from all persons
+		// those with addresses in europe
+		DomainObjectMatch<Person> inEuropeMatch =
+				q.SELECT_FROM(personMatch).ELEMENTS(
+						q.WHERE(areasMatch).CONTAINS(europeMatch)
+				);
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> inEurope = result.resultOf(inEuropeMatch);
+		// you can retrieve the intermediate results as well
+		List<Area> europe = result.resultOf(europeMatch);
+		List<Area> areas = result.resultOf(areasMatch);
+		/*****************************************************/
+		
+		/****** Select using the COUNT operation ********/
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		// By default it will match all persons
+		personMatch = q.createMatch(Person.class);
+		
+		// select all person's addresses by means
+		// of a traversal expression
+		addressMatch =
+				q.TRAVERSE_FROM(personMatch).FORTH("pointsOfContact").TO(Address.class);
+
+		// Select from all persons those,
+		// who have exactly two addresses
+		DomainObjectMatch<Person> twoAddressesMatch =
+				q.SELECT_FROM(personMatch).ELEMENTS(
+						q.WHERE(addressMatch.COUNT()).EQUALS(2)
+				);
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> twoAddresses = result.resultOf(twoAddressesMatch);
 		/*****************************************************/
 		
 		return;
