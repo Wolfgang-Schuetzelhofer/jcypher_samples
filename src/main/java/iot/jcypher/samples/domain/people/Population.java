@@ -160,10 +160,17 @@ public class Population {
 		Person sarah_maier = new Person("Sarah", "Maier", Gender.FEMALE, "blue");
 		sarah_maier.getPointsOfContact().add(maier_address);
 		
+		Address clark_kent_address = new Address("Kearny Street", 34);
+		clark_kent_address.setArea(sanFrancisco);
+		
+		Person clark_kent = new Person("Clark", "Kent", Gender.MALE, "black");
+		clark_kent.getPointsOfContact().add(clark_kent_address);
+		
 		domainObjects.add(jim_watson);
 		domainObjects.add(angie_clark);
 		domainObjects.add(herbert_maier);
 		domainObjects.add(sarah_maier);
+		domainObjects.add(clark_kent);
 	}
 	
 	private void createCompanies(List<Object> domainObjects) {

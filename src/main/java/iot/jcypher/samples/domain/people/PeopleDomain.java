@@ -60,8 +60,12 @@ public class PeopleDomain {
 //		performDomainQueries_TraversalExpressions();
 		
 		// demonstrates how to formulate and execute domain queries.
-		// Part 3: Collection Expressions
-		performDomainQueries_CollectionExpressions();
+		// Part 3: Collection Expressions SELECT
+//		performDomainQueries_CollectionExpressions_Select();
+		
+		// demonstrates how to formulate and execute domain queries.
+		// Part 3: Collection Expressions REJECT
+		performDomainQueries_CollectionExpressions_Reject();
 		
 		return;
 	}
@@ -521,9 +525,9 @@ public class PeopleDomain {
 	
 	/**
 	 * demonstrates how to formulate and perform domain queries.
-	 * Part 3: Collection Expressions.
+	 * Part 3: Collection Expressions - SELECT.
 	 */
-	public static void performDomainQueries_CollectionExpressions() {
+	public static void performDomainQueries_CollectionExpressions_Select() {
 		
 		IDomainAccess domainAccess = Config.createDomainAccess();
 		
@@ -634,6 +638,55 @@ public class PeopleDomain {
 		result = q.execute();
 		// retrieve the list of matching domain objects
 		List<Person> twoAddresses = result.resultOf(twoAddressesMatch);
+		/*****************************************************/
+		
+		return;
+	}
+	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 * Part 3: Collection Expressions - REJECT.
+	 */
+	public static void performDomainQueries_CollectionExpressions_Reject() {
+		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Reject by specifying a constraint on a derived  set ****/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		// By default it will match all persons
+		DomainObjectMatch<Person> personMatch = q.createMatch(Person.class);
+		
+		// select the areas of all person's addresses
+		DomainObjectMatch<Area> areasMatch = q.TRAVERSE_FROM(personMatch).FORTH("pointsOfContact")
+				.FORTH("area").TO(Area.class);
+		// Select from all persons
+		// those that live in the San Francisco
+		DomainObjectMatch<Person> inSFMatch =
+				q.SELECT_FROM(personMatch).ELEMENTS(
+						q.WHERE(areasMatch.atttribute("name")).EQUALS("San Francisco")
+				);
+
+		// select addresses of persons living in San Francisco
+		// by means of a traversal expression
+		DomainObjectMatch<Address> addressMatch =
+				q.TRAVERSE_FROM(inSFMatch).FORTH("pointsOfContact").TO(Address.class);
+		
+		// Reject from all persons living in San Francisco
+		// those that live on market street
+		DomainObjectMatch<Person> notOnMarketStreetMatch =
+				q.REJECT_FROM(inSFMatch).ELEMENTS(
+						q.WHERE(addressMatch.atttribute("street")).EQUALS("Market Street")
+				);
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> notOnMarketStreet = result.resultOf(notOnMarketStreetMatch);
+		List<Person> inSF = result.resultOf(inSFMatch);
+		List<Address> address = result.resultOf(addressMatch);
+		List<Area> areas = result.resultOf(areasMatch);
 		/*****************************************************/
 		
 		return;
