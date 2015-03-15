@@ -51,6 +51,12 @@ public class PeopleDomain {
 		// demonstrates how to retrieve domain information.
 //		retrieveDomainInformation();
 		
+		// enable printing the generated CYPHER queries to System.out.
+		// Note: The queries return ids, which will be used to resolve
+		// the domain objects in a second step (the queries which resolve
+		// the domain objects are not printed to System.out)
+		showCypherQueries();
+		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 1: Predicate Expressions
 //		performDomainQueries_PredicateExpressions();
@@ -65,7 +71,11 @@ public class PeopleDomain {
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 3: Collection Expressions REJECT
-		performDomainQueries_CollectionExpressions_Reject();
+//		performDomainQueries_CollectionExpressions_Reject();
+		
+		// demonstrates how to formulate and execute domain queries.
+		// Part 3: Collection Expressions COLLECT
+		performDomainQueries_CollectionExpressions_Collect();
 		
 		return;
 	}
@@ -691,5 +701,47 @@ public class PeopleDomain {
 		
 		return;
 	}
+	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 * Part 3: Collection Expressions - COLLECT.
+	 */
+	public static void performDomainQueries_CollectionExpressions_Collect() {
 		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Collect attributed from a set of domain objects ****/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// Create a DomainObjectMatch for objects of type Person.
+		DomainObjectMatch<Person> smithsMatch = q.createMatch(Person.class);
+		// define a predicate expression in form of a WHERE clause
+		// which constrains the set of Persons to contain all Smiths
+		q.WHERE(smithsMatch.atttribute("lastName")).EQUALS("Smith");
+		
+		// collect the first names of all Smiths
+		DomainObjectMatch<String> firstNamesMatch =
+				q.COLLECT(smithsMatch.atttribute("firstName")).AS(String.class);
+		
+		// if you want to do sorting,
+		// you have to sort the set from which you collect the attributes
+		q.ORDER(smithsMatch).BY("firstName");
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		List<String> firstNames = result.resultOf(firstNamesMatch);
+		/*****************************************************/
+		
+		return;
+	}
+	
+	/**
+	 * Enable printing the generated CYPHER queries to System.out.
+	 */
+	private static void showCypherQueries() {
+		QueriesPrintObserver.addOutputStream(System.out);
+		
+		QueriesPrintObserver.addToEnabledQueries("DOM QUERY", ContentToObserve.CYPHER);
+	}
 }

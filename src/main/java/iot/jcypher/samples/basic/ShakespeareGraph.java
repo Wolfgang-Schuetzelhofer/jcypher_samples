@@ -14,7 +14,7 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples;
+package iot.jcypher.samples.basic;
 
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.api.IClause;

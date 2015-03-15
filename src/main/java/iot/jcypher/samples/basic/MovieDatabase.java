@@ -14,7 +14,7 @@
  * limitations under the License.
  ************************************************************************/
 
-package iot.jcypher.samples;
+package iot.jcypher.samples.basic;
 
 import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
