@@ -1,5 +1,5 @@
 /************************************************************************
- * Copyright (c) 2014 IoT-Solutions e.U.
+ * Copyright (c) 2014-2015 IoT-Solutions e.U.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,32 +46,32 @@ public class PeopleDomain {
 	public static void main(String[] args) {
 
 		// demonstrates how to store and retrieve domain objects.
-//		storeAndRetrieveDomainObjects();
+		storeAndRetrieveDomainObjects();
 		
 		// demonstrates how to retrieve domain information.
-//		retrieveDomainInformation();
+		retrieveDomainInformation();
 		
 		// enable printing the generated CYPHER queries to System.out.
-		// Note: The queries return ids, which will be used to resolve
+		// Note: The queries return ids, which are used to resolve
 		// the domain objects in a second step (the queries which resolve
 		// the domain objects are not printed to System.out)
-		showCypherQueries();
+//		showCypherQueries();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 1: Predicate Expressions
-//		performDomainQueries_PredicateExpressions();
+		performDomainQueries_PredicateExpressions();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 2: Traversal Expressions
-//		performDomainQueries_TraversalExpressions();
+		performDomainQueries_TraversalExpressions();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 3: Collection Expressions SELECT
-//		performDomainQueries_CollectionExpressions_Select();
+		performDomainQueries_CollectionExpressions_Select();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 3: Collection Expressions REJECT
-//		performDomainQueries_CollectionExpressions_Reject();
+		performDomainQueries_CollectionExpressions_Reject();
 		
 		// demonstrates how to formulate and execute domain queries.
 		// Part 3: Collection Expressions COLLECT
