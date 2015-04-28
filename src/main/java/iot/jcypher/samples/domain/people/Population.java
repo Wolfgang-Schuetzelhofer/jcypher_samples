@@ -129,16 +129,33 @@ public class Population {
 		
 		Person hans_berghammer = new Person("Hans", "Berghammer", Gender.MALE, "blue");
 		hans_berghammer.getPointsOfContact().add(berghammer_address);
-		Person gerda_berhammer = new Person("Gerda", "Berghammer", Gender.FEMALE, "green");
-		gerda_berhammer.getPointsOfContact().add(berghammer_address);
+		Person gerda_berghammer = new Person("Gerda", "Berghammer", Gender.FEMALE, "green");
+		gerda_berghammer.getPointsOfContact().add(berghammer_address);
 		Person christa_berhammer = new Person("Christa", "Berghammer", Gender.FEMALE, "brown");
 		christa_berhammer.getPointsOfContact().add(berghammer_address);
-		christa_berhammer.setMother(gerda_berhammer);
+		christa_berhammer.setMother(gerda_berghammer);
 		christa_berhammer.setFather(hans_berghammer);
 		
+		Person hannah_berhammer = new Person("Hannah", "Berghammer", Gender.FEMALE, "blue");
+		hannah_berhammer.getPointsOfContact().add(gerda_berghammer.getPointsOfContact().get(0));
+		hannah_berhammer.setMother(gerda_berghammer);
+		hannah_berhammer.setFather(hans_berghammer);
+		
+		Person max_berhammer = new Person("Max", "Berghammer", Gender.MALE, "green");
+		max_berhammer.getPointsOfContact().add(gerda_berghammer.getPointsOfContact().get(0));
+		max_berhammer.setMother(gerda_berghammer);
+		max_berhammer.setFather(hans_berghammer);
+		
+		Person fritz_berghammer = new Person("Fritz", "Berghammer", Gender.MALE, "brown");
+		fritz_berghammer.getPointsOfContact().add(gerda_berghammer.getPointsOfContact().get(0));
+		fritz_berghammer.setMother(gerda_berghammer);
+		
 		domainObjects.add(hans_berghammer);
-		domainObjects.add(gerda_berhammer);
+		domainObjects.add(gerda_berghammer);
 		domainObjects.add(christa_berhammer);
+		domainObjects.add(hannah_berhammer);
+		domainObjects.add(max_berhammer);
+		domainObjects.add(fritz_berghammer);
 	}
 	
 	private void createMore(List<Object> domainObjects) {
@@ -156,6 +173,9 @@ public class Population {
 		maier_address.setArea(vienna_17);
 		Person herbert_maier = new Person("Herbert", "Maier", Gender.MALE, "green");
 		herbert_maier.getPointsOfContact().add(maier_address);
+		
+		Person fritz_berghammer = (Person) domainObjects.get(domainObjects.size() - 1);
+		fritz_berghammer.setFather(herbert_maier);
 		
 		Person sarah_maier = new Person("Sarah", "Maier", Gender.FEMALE, "blue");
 		sarah_maier.getPointsOfContact().add(maier_address);

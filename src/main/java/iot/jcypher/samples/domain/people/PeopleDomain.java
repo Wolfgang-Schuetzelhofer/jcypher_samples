@@ -38,7 +38,6 @@ import iot.jcypher.samples.domain.people.util.Util;
 import iot.jcypher.util.QueriesPrintObserver;
 import iot.jcypher.util.QueriesPrintObserver.ContentToObserve;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class PeopleDomain {
@@ -76,6 +75,10 @@ public class PeopleDomain {
 		// demonstrates how to formulate and execute domain queries.
 		// Part 3: Collection Expressions COLLECT
 		performDomainQueries_CollectionExpressions_Collect();
+		
+		// demonstrates how to formulate and execute domain queries.
+		// Collection Expressions - UNION - INTERSECTION
+		performDomainQueries_Collections_Union_Intersection();
 		
 		return;
 	}
@@ -736,6 +739,70 @@ public class PeopleDomain {
 		return;
 	}
 	
+	/**
+	 * demonstrates how to formulate and perform domain queries.
+	 * Collection Expressions - UNION - INTERSECTION.
+	 */
+	public static void performDomainQueries_Collections_Union_Intersection() {
+	
+		IDomainAccess domainAccess = Config.createDomainAccess();
+	
+		/****** Simple UNION of two sets of domain objects ****/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> smithsMatch = q.createMatch(Person.class);
+		// constrains the set of Persons to contain all Smiths
+		q.WHERE(smithsMatch.atttribute("lastName")).EQUALS("Smith");
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> berghammersMatch = q.createMatch(Person.class);
+		// constrains the set of Persons to contain all Berghammers
+		q.WHERE(berghammersMatch.atttribute("lastName")).EQUALS("Berghammer");
+		
+		// build the union, containing all Smiths and all Berghammers
+		// Note: you can build the union of any number of sets
+		DomainObjectMatch<Person> smiths_berghammersMatch = q.UNION(smithsMatch, berghammersMatch);
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> smiths_berghammers = result.resultOf(smiths_berghammersMatch);
+		/*****************************************************/
+		
+		/****** INTERSECTION together with SELECT Expression ****/
+		/** You want to retrieve persons who have a given number
+		 * of true siblings (not half siblings).
+		 */
+		int siblingsNumber = 2;
+		
+		// create a DomainQuery object
+		q = domainAccess.createQuery();
+		
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> personsMatch = q.createMatch(Person.class);
+		
+		// retrieve a set of persons who have the same mother as the given person
+		DomainObjectMatch<Person> m_childrenMatch = q.TRAVERSE_FROM(personsMatch).FORTH("mother")
+				.BACK("mother").TO(Person.class);
+		// retrieve a set of persons who have the same father as the given person
+		DomainObjectMatch<Person> f_childrenMatch = q.TRAVERSE_FROM(personsMatch).FORTH("father")
+				.BACK("father").TO(Person.class);
+		// build a set of persons who have the same mother and father (true siblings)
+		DomainObjectMatch<Person> siblingsMatch = q.INTERSECTION(m_childrenMatch, f_childrenMatch);
+		
+		// select those with a given number of siblings
+		DomainObjectMatch<Person> hasNumSiblingsMatch = q.SELECT_FROM(personsMatch).ELEMENTS(
+				q.WHERE(siblingsMatch.COUNT()).EQUALS(siblingsNumber)
+		);
+		
+		// execute the query
+		result = q.execute();
+		// retrieve the list of matching domain objects
+		List<Person> hasNumSiblings = result.resultOf(hasNumSiblingsMatch);
+	
+		return;
+	}
+
 	/**
 	 * Enable printing the generated CYPHER queries to System.out.
 	 */
