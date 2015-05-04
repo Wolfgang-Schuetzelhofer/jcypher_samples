@@ -779,26 +779,27 @@ public class PeopleDomain {
 		q = domainAccess.createQuery();
 		
 		// create a DomainObjectMatch for objects of type Person
+		// by default the set contains all persons
 		DomainObjectMatch<Person> personsMatch = q.createMatch(Person.class);
 		
-		// retrieve a set of persons who have the same mother as the given person
+		// retrieve a set of persons who have the same mother as a given person
 		DomainObjectMatch<Person> m_childrenMatch = q.TRAVERSE_FROM(personsMatch).FORTH("mother")
 				.BACK("mother").TO(Person.class);
-		// retrieve a set of persons who have the same father as the given person
+		// retrieve a set of persons who have the same father as a given person
 		DomainObjectMatch<Person> f_childrenMatch = q.TRAVERSE_FROM(personsMatch).FORTH("father")
 				.BACK("father").TO(Person.class);
 		// build a set of persons who have the same mother and father (true siblings)
 		DomainObjectMatch<Person> siblingsMatch = q.INTERSECTION(m_childrenMatch, f_childrenMatch);
 		
-		// select those with a given number of siblings
-		DomainObjectMatch<Person> hasNumSiblingsMatch = q.SELECT_FROM(personsMatch).ELEMENTS(
+		// select all persons with a given number of siblings
+		DomainObjectMatch<Person> haveNumSiblingsMatch = q.SELECT_FROM(personsMatch).ELEMENTS(
 				q.WHERE(siblingsMatch.COUNT()).EQUALS(siblingsNumber)
 		);
 		
 		// execute the query
 		result = q.execute();
 		// retrieve the list of matching domain objects
-		List<Person> hasNumSiblings = result.resultOf(hasNumSiblingsMatch);
+		List<Person> haveNumSiblings = result.resultOf(haveNumSiblingsMatch);
 	
 		return;
 	}
