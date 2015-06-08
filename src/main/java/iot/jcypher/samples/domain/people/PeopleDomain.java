@@ -502,7 +502,7 @@ public class PeopleDomain {
 		result = q.execute();
 		
 		// retrieve the list of matching domain objects.
-		// It will contain the all residents of 'Market Street 20'
+		// It will contain all residents of 'Market Street 20'
 		// (ordered ascending).
 		List<Person> residents = result.resultOf(residentsMatch);
 		/*****************************************************/
@@ -848,7 +848,7 @@ public class PeopleDomain {
 		/****** Query 2, use result of Query 1 as starting point *****/
 		// create a DomainQuery object
 		DomainQuery q1 = domainAccess.createQuery();
-		// create a DomainObjectMatch for the result of a previous query
+		// create a DomainObjectMatch from the result of a previous query
 		DomainObjectMatch<Address> m_streetMatch = q1.createMatchFor(m_street);
 		
 		// Traverse backwards, start with the address resulting from
@@ -865,7 +865,7 @@ public class PeopleDomain {
 		DomainQueryResult result1 = q1.execute();
 		
 		// retrieve the list of matching domain objects.
-		// It will contain the all residents of 'Market Street 20'
+		// It will contain all residents of 'Market Street 20'
 		// (ordered ascending by firstName).
 		List<Person> residents = result1.resultOf(residentsMatch);
 		
