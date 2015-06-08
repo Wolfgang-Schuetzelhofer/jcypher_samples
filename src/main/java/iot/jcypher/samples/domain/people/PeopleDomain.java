@@ -80,6 +80,10 @@ public class PeopleDomain {
 		// Collection Expressions - UNION - INTERSECTION
 		performDomainQueries_Collections_Union_Intersection();
 		
+		// demonstrates how to use results from one domain query
+		// as starting points for another domain query.
+		performDomainQuery_Concatenation();
+		
 		return;
 	}
 	
@@ -801,6 +805,70 @@ public class PeopleDomain {
 		// retrieve the list of matching domain objects
 		List<Person> haveNumSiblings = result.resultOf(haveNumSiblingsMatch);
 	
+		return;
+	}
+	
+	/**
+	 * demonstrates how to use results from one domain query
+	 * as starting points for another domain query.
+	 */
+	public static void performDomainQuery_Concatenation() {
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Query 1 ********************************/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> j_smithMatch = q.createMatch(Person.class);
+
+		// Constrain the set of Persons to contain
+		// 'John Smith' only
+		q.WHERE(j_smithMatch.atttribute("lastName")).EQUALS("Smith");
+		q.WHERE(j_smithMatch.atttribute("firstName")).EQUALS("John");
+		
+		// Traverse forward, start with 'John Smith'
+		// (j_smithMatch is constraint to match 'John Smith' only),
+		// navigate attribute 'pointsOfContact',
+		// end matching objects of type Address.
+		DomainObjectMatch<Address> j_smith_AddressesMatch =
+				q.TRAVERSE_FROM(j_smithMatch).FORTH("pointsOfContact").TO(Address.class);
+		q.ORDER(j_smith_AddressesMatch).BY("street");
+		
+		// execute the query
+		DomainQueryResult result = q.execute();
+		// retrieve the list of matching domain objects
+		// (i.e. all addresses of 'John Smith')
+		List<Address> j_smith_Addresses = result.resultOf(j_smith_AddressesMatch);
+		
+		/**
+		 * You can work with the addresses retrieved by query 1
+		 */
+		Address m_street = j_smith_Addresses.get(0);
+		
+		/****** Query 2, use result of Query 1 as starting point *****/
+		// create a DomainQuery object
+		DomainQuery q1 = domainAccess.createQuery();
+		// create a DomainObjectMatch for the result of a previous query
+		DomainObjectMatch<Address> m_streetMatch = q1.createMatchFor(m_street);
+		
+		// Traverse backwards, start with the address resulting from
+		// a previous query ('Market Street 20' in this case),
+		// navigate backwards via attribute 'pointsOfContact',
+		// end matching objects of type Person.
+		DomainObjectMatch<Person> residentsMatch =
+			q1.TRAVERSE_FROM(m_streetMatch).BACK("pointsOfContact")
+				.TO(Person.class);
+		// order the result by attribute 'firstName' ascending
+		q1.ORDER(residentsMatch).BY("firstName");
+		
+		// execute the query
+		DomainQueryResult result1 = q1.execute();
+		
+		// retrieve the list of matching domain objects.
+		// It will contain the all residents of 'Market Street 20'
+		// (ordered ascending by firstName).
+		List<Person> residents = result1.resultOf(residentsMatch);
+		
 		return;
 	}
 
