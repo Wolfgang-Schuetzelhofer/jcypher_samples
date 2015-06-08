@@ -1,7 +1,7 @@
 JCypher Samples
 ===============
 
-Provides samples for JCypher.
+Provides samples for [**JCypher**](http://wolfgang-schuetzelhofer.github.io/jcypher/).
 ## Documentation and Getting Started
 For documentation and on how to get started please have a look at the wiki:
 https://github.com/Wolfgang-Schuetzelhofer/jcypher_samples/wiki
