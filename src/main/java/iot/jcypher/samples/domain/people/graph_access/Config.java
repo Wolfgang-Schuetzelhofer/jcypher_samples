@@ -29,6 +29,9 @@ public class Config {
 
 	public static String domainName;
 	private static IDBAccess dbAccess;
+	private static String userId = null;
+	private static String password = null;
+	
 	
 	static {
 		// a domain needs a unique name within a graph database
@@ -44,7 +47,10 @@ public class Config {
 		props.setProperty(DBProperties.DATABASE_DIR, "C:/NEO4J_DBS/01");
 		// no properties needed for in memory access
 		
-		dbAccess = DBAccessFactory.createDBAccess(DBType.REMOTE, props);
+		if (userId != null && password != null)
+			dbAccess = DBAccessFactory.createDBAccess(DBType.REMOTE, props, userId, password);
+		else
+			dbAccess = DBAccessFactory.createDBAccess(DBType.REMOTE, props);
 //		dbAccess = DBAccessFactory.createDBAccess(DBType.EMBEDDED, props);
 //		dbAccess = DBAccessFactory.createDBAccess(DBType.IN_MEMORY, props);
 	}
