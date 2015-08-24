@@ -35,6 +35,7 @@ import iot.jcypher.samples.domain.people.model.Person;
 import iot.jcypher.samples.domain.people.model.Subject;
 import iot.jcypher.samples.domain.people.util.CompareUtil;
 import iot.jcypher.samples.domain.people.util.Util;
+import iot.jcypher.transaction.ITransaction;
 import iot.jcypher.util.QueriesPrintObserver;
 import iot.jcypher.util.QueriesPrintObserver.ContentToObserve;
 
@@ -83,6 +84,10 @@ public class PeopleDomain {
 		// demonstrates how to use results from one domain query
 		// as starting points for another domain query.
 		performDomainQuery_Concatenation();
+		
+		// demonstrates how to define units of work
+		// by means of the transaction API
+		handleTransactions();
 		
 		return;
 	}
@@ -868,6 +873,101 @@ public class PeopleDomain {
 		// It will contain all residents of 'Market Street 20'
 		// (ordered ascending by firstName).
 		List<Person> residents = result1.resultOf(residentsMatch);
+		
+		return;
+	}
+	
+	/**
+	 * demonstrates how to define units of work
+	 * by means of the transaction API
+	 */
+	public static void handleTransactions() {
+		IDBAccess dbAccess = Config.getDBAccess();
+		
+		// if you want to call this method multiple times
+		// on the same remote or embedded db, and you
+		// want the simple tests performed by queries to succeed,
+		// you have to call clearDatabas() to reset the db.
+//		dbAccess.clearDatabase();
+		
+		List<JcError> errors;
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		// A utility class for creating a sample population.
+		Population domainPopulator = new Population();
+		
+		// create a domain object (Bill Collins)
+		Person bill_collins = domainPopulator.createBillCollins();
+		
+		/** rollback ****************************************/
+		// begin a transaction (a unit of work)
+		ITransaction tx = domainAccess.beginTX();
+		
+		// store the domain object
+		// (this is done as part of the transaction)
+		errors = domainAccess.store(bill_collins);
+		if (errors.size() > 0) {
+			Util.printErrors(errors);
+			throw new JcResultException(errors);
+		}
+		
+		// mark the transaction as failed
+		tx.failure();
+		
+		// close the transaction;
+		// it will be rolled back, because it was marked as failed
+		errors = tx.close();
+		if (errors.size() > 0) {
+			Util.printErrors(errors);
+			throw new JcResultException(errors);
+		}
+		
+		// now verify that the transaction has been rolled back
+		DomainQuery query = domainAccess.createQuery();
+		DomainObjectMatch<Person> billCollinsMatch = query.createMatch(Person.class);
+		query.WHERE(billCollinsMatch.atttribute("lastName")).EQUALS("Collins");
+		query.WHERE(billCollinsMatch.atttribute("firstName")).EQUALS("Bill");
+		
+		// execute the query
+		DomainQueryResult result = query.execute();
+		List<Person> billCollins = result.resultOf(billCollinsMatch);
+		
+		// test that Bill Collins has not been stored
+		boolean wasRolledBack = billCollins.size() == 0;
+		
+		/** commit ****************************************/
+//		domainAccess = Config.createDomainAccess();
+		// begin a transaction (a unit of work)
+		tx = domainAccess.beginTX();
+		
+		// store the domain object
+		// (this is done as part of the transaction)
+		errors = domainAccess.store(bill_collins);
+		if (errors.size() > 0) {
+			Util.printErrors(errors);
+			throw new JcResultException(errors);
+		}
+		
+		// close the transaction;
+		// it will be committed, because it was not marked as failed
+		errors = tx.close();
+		if (errors.size() > 0) {
+			Util.printErrors(errors);
+			throw new JcResultException(errors);
+		}
+		
+		// now verify that the transaction has been committed
+		query = domainAccess.createQuery();
+		billCollinsMatch = query.createMatch(Person.class);
+		query.WHERE(billCollinsMatch.atttribute("lastName")).EQUALS("Collins");
+		query.WHERE(billCollinsMatch.atttribute("firstName")).EQUALS("Bill");
+		
+		// execute the query
+		result = query.execute();
+		billCollins = result.resultOf(billCollinsMatch);
+		
+		// test that Bill Collins has been stored
+		boolean wasCommitted = billCollins.size() == 1;
 		
 		return;
 	}

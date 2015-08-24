@@ -65,6 +65,18 @@ public class Population {
 		return domainObjects;
 	}
 	
+	public Person createBillCollins() {
+		if (this.earth == null)
+			createPlaces();
+		Address collins_address = new Address("Union Square", 2);
+		collins_address.setArea(sanFrancisco);
+		
+		Person bill_collins = new Person("Bill", "Collins", Gender.MALE, "gray");
+		bill_collins.getPointsOfContact().add(collins_address);
+		
+		return bill_collins;
+	}
+	
 	private void createPlaces() {
 		earth = new Area(null, "Earth", AreaType.PLANET);
 		northAmerica = new Area(null, "North America", AreaType.CONTINENT);
