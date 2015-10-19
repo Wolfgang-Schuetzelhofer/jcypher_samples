@@ -38,6 +38,7 @@ import iot.jcypher.samples.domain.people.util.Util;
 import iot.jcypher.transaction.ITransaction;
 import iot.jcypher.util.QueriesPrintObserver;
 import iot.jcypher.util.QueriesPrintObserver.ContentToObserve;
+import iot.jcypher.util.QueriesPrintObserver.QueryToObserve;
 
 import java.util.List;
 
@@ -978,6 +979,6 @@ public class PeopleDomain {
 	private static void showCypherQueries() {
 		QueriesPrintObserver.addOutputStream(System.out);
 		
-		QueriesPrintObserver.addToEnabledQueries("DOM QUERY", ContentToObserve.CYPHER);
+		QueriesPrintObserver.addToEnabledQueries(QueryToObserve.DOM_QUERY, ContentToObserve.CYPHER);
 	}
 }

@@ -91,7 +91,7 @@ public class Population {
 		europe.setPartOf(earth);
 		germany = new Area("2", "Germany", AreaType.COUNTRY);
 		germany.setPartOf(europe);
-		munich = new Area(null, "Munic", AreaType.CITY);
+		munich = new Area(null, "Munich", AreaType.CITY);
 		munich.setPartOf(germany);
 		newYork = new Area(null, "New York", AreaType.STATE);
 		newYork.setPartOf(usa);
