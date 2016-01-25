@@ -263,13 +263,13 @@ public class GenericPeopleDomain {
 		List<DOField> declaredFields = doType.getDeclaredFields();
 		
 		// ask the type for all it's fields (including those declared by super types)
-		List<DOField> allFields = doType.getDeclaredFields();
+		List<DOField> allFields = doType.getFields();
 		
 		// ask the type for the names it's declared fields
 		List<String> declaredFieldNames = doType.getDeclaredFieldNames();
 				
 		// ask the type for all it's fields names (including those fields declared by super types)
-		List<String> allFieldNames = doType.getDeclaredFieldNames();
+		List<String> allFieldNames = doType.getFieldNames();
 		
 		return;
 	}
