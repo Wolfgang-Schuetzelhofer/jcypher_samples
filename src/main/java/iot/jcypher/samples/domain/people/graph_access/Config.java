@@ -22,6 +22,7 @@ import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
 import iot.jcypher.domain.DomainAccessFactory;
 import iot.jcypher.domain.IDomainAccess;
+import iot.jcypher.domain.IDomainAccessFactory;
 
 import java.util.Properties;
 
@@ -69,5 +70,14 @@ public class Config {
 	 */
 	public static IDomainAccess createDomainAccess() {
 		return DomainAccessFactory.createDomainAccess(dbAccess, domainName);
+	}
+	
+	/**
+	 * answer a new IDomainAccess to work with a certain domain within a graph database.
+	 * <br/>The returned IDomainAccess instance is thread-safe
+	 * @return a new IDomainAccess
+	 */
+	public static IDomainAccess createThreadSafeDomainAccess() {
+		return IDomainAccessFactory.INSTANCE_SYNCHRONIZED.createDomainAccess(dbAccess, domainName);
 	}
 }

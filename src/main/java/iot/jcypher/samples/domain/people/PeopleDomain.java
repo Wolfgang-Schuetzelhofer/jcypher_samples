@@ -109,6 +109,7 @@ public class PeopleDomain {
 		// Initially clear the database.
 		// Note: On how to create an IDBAccess (access to a graph database)
 		// and an IDomainAccess (access to a domain within a graph database)
+		// including a thread-safe IDomainAccess,
 		// hava a look at the 'Config class' in the 'graph_access' subpackage.
 		IDBAccess dbAccess = Config.getDBAccess();
 		errors = dbAccess.clearDatabase();
