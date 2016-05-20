@@ -24,6 +24,7 @@ import iot.jcypher.domain.SyncInfo;
 import iot.jcypher.domainquery.CountQueryResult;
 import iot.jcypher.domainquery.DomainQuery;
 import iot.jcypher.domainquery.DomainQueryResult;
+import iot.jcypher.domainquery.QueryPersistor;
 import iot.jcypher.domainquery.api.DomainObjectMatch;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.result.JcResultException;
@@ -48,6 +49,7 @@ public class PeopleDomain {
 
 		// demonstrates how to store and retrieve domain objects.
 		storeAndRetrieveDomainObjects();
+		storeDomainQuery();
 		
 		// demonstrates how to retrieve domain information.
 		retrieveDomainInformation();
@@ -89,6 +91,9 @@ public class PeopleDomain {
 		// demonstrates how to define units of work
 		// by means of the transaction API
 		handleTransactions();
+		
+		// demonstrates how to store and load a domain query
+		storeDomainQuery();
 		
 		return;
 	}
@@ -970,6 +975,55 @@ public class PeopleDomain {
 		
 		// test that Bill Collins has been stored
 		boolean wasCommitted = billCollins.size() == 1;
+		
+		return;
+	}
+	
+	/**
+	 * demonstrates how to store and load a domain query
+	 */
+	public static void storeDomainQuery() {
+		
+		IDomainAccess domainAccess = Config.createDomainAccess();
+		
+		/****** Create and store a domain query ****/
+		/****** Select all Persons with lastName Smith who have Addresses in Europe ****/
+		// create a DomainQuery object
+		DomainQuery q = domainAccess.createQuery();
+		// create a DomainObjectMatch for objects of type Person
+		DomainObjectMatch<Person> smithsMatch = q.createMatch(Person.class);
+		// define a predicate expression in form of a WHERE clause
+		// which constrains the set of Persons
+		q.WHERE(smithsMatch.atttribute("lastName")).EQUALS("Smith");
+		
+		// create a DomainObjectMatch for objects of type Area
+		DomainObjectMatch<Area> europeMatch = q.createMatch(Area.class);
+		// constrain the set of areas
+		// to contain europe only
+		q.WHERE(europeMatch.atttribute("name")).EQUALS("Europe");
+		
+		// collect all Areas of Smith's Addresses
+		DomainObjectMatch<Area> smithAreasMatch = 
+				q.TRAVERSE_FROM(smithsMatch).FORTH("pointsOfContact").FORTH("area").FORTH("partOf").DISTANCE(0, -1).TO(Area.class);
+		
+		// Select from all Smiths those with Addresses in Europe
+		DomainObjectMatch<Person> smithsInEuropeMatch = q.SELECT_FROM(smithsMatch).ELEMENTS(
+				q.WHERE(smithAreasMatch).CONTAINS(europeMatch)
+		);
+		
+		// Create a query persistor
+		QueryPersistor qPersistor = domainAccess.createQueryPersistor(q);
+		
+		// Augment DomainObjectMatches by assigning them with meaningful names.
+		// In that way stored queries easier to read.
+		qPersistor.augment(smithsMatch, "smiths")
+		.augment(smithsInEuropeMatch, "smithsInEurope")
+		.augment(europeMatch, "europe")
+		.augment(smithAreasMatch, "smithAreas");
+		
+		// Store the domain query with the domain model.
+		// A domain query must have a unique name within a domain model
+		qPersistor.storeAs("Smiths_In_Europe");
 		
 		return;
 	}

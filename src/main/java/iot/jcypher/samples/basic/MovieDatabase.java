@@ -96,7 +96,7 @@ public class MovieDatabase {
 				CREATE.node(keanu).label("Actor")
 						.property("name").value("Keanu Reeves")
 						.property("like").value(8.5)
-						.property("numbers").value(1, 2, 3),
+						.property("numbers").values(1, 2, 3),
 				CREATE.node(laurence).label("Actor")
 						.property("name").value("Laurence Fishburne")
 						.property("like").value(7),
