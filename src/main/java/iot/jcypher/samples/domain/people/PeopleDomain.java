@@ -24,6 +24,7 @@ import iot.jcypher.domain.SyncInfo;
 import iot.jcypher.domainquery.CountQueryResult;
 import iot.jcypher.domainquery.DomainQuery;
 import iot.jcypher.domainquery.DomainQueryResult;
+import iot.jcypher.domainquery.QueryLoader;
 import iot.jcypher.domainquery.QueryPersistor;
 import iot.jcypher.domainquery.api.DomainObjectMatch;
 import iot.jcypher.query.result.JcError;
@@ -49,7 +50,6 @@ public class PeopleDomain {
 
 		// demonstrates how to store and retrieve domain objects.
 		storeAndRetrieveDomainObjects();
-		storeDomainQuery();
 		
 		// demonstrates how to retrieve domain information.
 		retrieveDomainInformation();
@@ -93,7 +93,7 @@ public class PeopleDomain {
 		handleTransactions();
 		
 		// demonstrates how to store and load a domain query
-		storeDomainQuery();
+		store_load_DomainQuery();
 		
 		return;
 	}
@@ -982,7 +982,7 @@ public class PeopleDomain {
 	/**
 	 * demonstrates how to store and load a domain query
 	 */
-	public static void storeDomainQuery() {
+	public static void store_load_DomainQuery() {
 		
 		IDomainAccess domainAccess = Config.createDomainAccess();
 		
@@ -1015,15 +1015,34 @@ public class PeopleDomain {
 		QueryPersistor qPersistor = domainAccess.createQueryPersistor(q);
 		
 		// Augment DomainObjectMatches by assigning them with meaningful names.
-		// In that way stored queries easier to read.
+		// In that way stored queries are easier to reuse and to read.
 		qPersistor.augment(smithsMatch, "smiths")
 		.augment(smithsInEuropeMatch, "smithsInEurope")
 		.augment(europeMatch, "europe")
 		.augment(smithAreasMatch, "smithAreas");
 		
-		// Store the domain query with the domain model.
-		// A domain query must have a unique name within a domain model
+		// Store the domain query.
+		// A domain query must have a unique name within a domain.
 		qPersistor.storeAs("Smiths_In_Europe");
+		
+		/****** Load a domain query ****/
+		// create a query loader for a stored domain query
+		QueryLoader<DomainQuery> qLoader = domainAccess.createQueryLoader("Smiths_In_Europe");
+		// load the query
+		DomainQuery qloaded = qLoader.load();
+		
+		// execute the query
+		DomainQueryResult result = qloaded.execute();
+		
+		// get the DomainObjectMatch you are interested in.
+		// See how handy it comes in, that you have given a name
+		// to the DomainObjectMatch (you have augmented it).
+		DomainObjectMatch<?> smithsInEuropeM = qLoader.getDomainObjectMatch("smithsInEurope");
+		// or if you know the type.
+		DomainObjectMatch<Person> smithsInEuropeMt = qLoader.getDomainObjectMatch("smithsInEurope", Person.class);
+		
+		// retrieve the list of matching domain objects
+		List<Person> smithInEurope = result.resultOf(smithsInEuropeMt);
 		
 		return;
 	}
